@@ -1,12 +1,13 @@
 package initializers
 
 import (
-	"authnz/models"
+	"authnz/internal/db"
+	"authnz/internal/services"
 	"fmt"
 )
 
 func SyncDB() {
-	err := DB.AutoMigrate(&models.User{})
+	err := db.DB.AutoMigrate(&services.User{})
 	if err != nil {
 		fmt.Errorf("error while automirating: %v", err)
 	}

@@ -3,10 +3,12 @@ package main
 import (
 	"authnz/controllers"
 	"authnz/initializers"
+	"authnz/internal/db"
 	"authnz/middlewarre"
 	"fmt"
 
 	_ "authnz/docs"
+
 	"github.com/gin-gonic/gin"
 	"github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -14,8 +16,8 @@ import (
 
 func init() {
 	initializers.LoadEnvVariables()
-	initializers.ConectToDB()
-	initializers.SyncDB()
+	db.ConectToDB()
+	db.SyncDB()
 }
 
 // @title Authnz API
