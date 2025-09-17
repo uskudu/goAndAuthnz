@@ -4,7 +4,7 @@ import (
 	"authnz/controllers"
 	"authnz/initializers"
 	"authnz/internal/db"
-	"authnz/middlewarre"
+	"authnz/internal/middlewarre"
 	"fmt"
 
 	_ "authnz/docs"

@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"authnz/initializers"
-	"authnz/models"
+	"authnz/internal/db"
+	"authnz/internal/userService"
 	"net/http"
 	"os"
 	"time"
@@ -44,12 +44,12 @@ func Signup(c *gin.Context) {
 		return
 	}
 	// create user in db
-	user := models.User{
+	user := userService.User{
 		Model:    gorm.Model{},
 		Email:    body.Email,
 		Password: string(hash),
 	}
-	result := initializers.DB.Create(&user)
+	result := db.DB.Create(&user)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to create user"})
 		return
@@ -77,8 +77,8 @@ func Login(c *gin.Context) {
 		return
 	}
 	// get user by email
-	var user models.User
-	result := initializers.DB.First(&user, "email = ?", body.Email)
+	var user userService.User
+	result := db.DB.First(&user, "email = ?", body.Email)
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "invalid email",

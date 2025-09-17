@@ -1,8 +1,8 @@
 package middlewarre
 
 import (
-	"authnz/initializers"
-	"authnz/models"
+	"authnz/internal/db"
+	"authnz/internal/userService"
 	"fmt"
 	"net/http"
 	"os"
@@ -41,8 +41,8 @@ func RequireAuth(c *gin.Context) {
 		return
 	}
 	// find user with token sub
-	var user models.User
-	initializers.DB.First(&user, claims["sub"])
+	var user userService.User
+	db.DB.First(&user, claims["sub"])
 	if user.ID == 0 {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
