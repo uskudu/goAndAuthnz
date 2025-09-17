@@ -2,7 +2,7 @@ package db
 
 import (
 	"authnz/internal/userService"
-	"fmt"
+	"log"
 	"os"
 
 	"gorm.io/driver/postgres"
@@ -11,18 +11,16 @@ import (
 
 var DB *gorm.DB
 
-func ConectToDB() {
+func Connect() (*gorm.DB, error) {
 	dsn := os.Getenv("DB")
 	var err error
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		panic("Failed to connnect to db")
+		log.Fatalf("failed to connect to db: %v", err)
 	}
-}
-
-func SyncDB() {
-	err := DB.AutoMigrate(&userService.User{})
+	err = DB.AutoMigrate(&userService.User{})
 	if err != nil {
-		fmt.Errorf("error while automirating: %v", err)
+		log.Fatalf("failed while migrating database: %v", err)
 	}
+	return DB, nil
 }

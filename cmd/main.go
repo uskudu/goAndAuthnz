@@ -1,10 +1,11 @@
 package main
 
 import (
-	"authnz/controllers"
 	"authnz/initializers"
 	"authnz/internal/db"
+	"authnz/internal/handlers"
 	"authnz/internal/middlewarre"
+	"authnz/internal/userService"
 	"fmt"
 
 	_ "authnz/docs"
@@ -14,25 +15,28 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func init() {
-	initializers.LoadEnvVariables()
-	db.ConectToDB()
-	db.SyncDB()
-}
-
 // @title Authnz API
 // @version 1.0
 // @description signup and login with jwt
 // @host localhost:3000
 // @BasePath /
 func main() {
+	initializers.LoadEnvVariables()
+	database, err := db.Connect()
+	if err != nil {
+		panic(err)
+	}
 	r := gin.Default()
 
+	usrRepo := userService.NewUserRepository(database)
+	usrService := userService.NewUserService(usrRepo)
+	usrHandlers := handlers.NewUserHandler(usrService)
+
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	r.POST("/signup", controllers.Signup)
-	r.POST("/login", controllers.Login)
-	r.GET("/validate", middlewarre.RequireAuth, controllers.Validate)
-	err := r.Run()
+	r.POST("/signup", usrHandlers.Signup)
+	r.POST("/login", usrHandlers.Login)
+	r.GET("/validate", middlewarre.RequireAuth, usrHandlers.Validate)
+	err = r.Run()
 	if err != nil {
 		fmt.Errorf("error while running gin: %v", err)
 	}

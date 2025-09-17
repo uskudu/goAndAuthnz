@@ -4,27 +4,27 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserRepository interface {
-	Signup(user User) (User, error)
-	Login(user User, emailFromBody string) error
+type UserRepositoryIface interface {
+	Create(user User) error
+	FindByEmail(emailFromBody string) (*User, error)
 }
 
-type userRepository struct {
+type UserRepository struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) UserRepository {
-	return &userRepository{db: db}
+func NewUserRepository(db *gorm.DB) UserRepositoryIface {
+	return &UserRepository{db: db}
 }
 
-func (r *userRepository) Signup(user User) (User, error) {
-	err := r.db.Create(&user).Error
-	if err != nil {
-		return User{}, err
+func (r *UserRepository) Create(user User) error {
+	return r.db.Create(&user).Error
+}
+
+func (r *UserRepository) FindByEmail(emailFromBody string) (*User, error) {
+	var user User
+	if err := r.db.First(&user, "email = ?", emailFromBody).Error; err != nil {
+		return &User{}, err
 	}
-	return user, nil
-}
-
-func (r *userRepository) Login(user User, emailFromBody string) error {
-	return r.db.First(&user, "email = ?", emailFromBody).Error
+	return &user, nil
 }
